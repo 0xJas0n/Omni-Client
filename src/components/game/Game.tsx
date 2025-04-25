@@ -16,6 +16,13 @@ const GameConst = () => {
             height: baseHeight,
             parent: 'phaser-container',
             scene: [MenuScene],
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 0 },
+                    debug: false
+                }
+            },
             scale: {
                 mode: Phaser.Scale.FIT,
                 zoom: zoom

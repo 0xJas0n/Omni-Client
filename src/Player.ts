@@ -1,91 +1,163 @@
-import Phaser from 'phaser'
+import Phaser from "phaser";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, playerId) {
+    private movementSpeed: number = 100;
+    private keys: {
+        w: Phaser.Input.Keyboard.Key;
+        a: Phaser.Input.Keyboard.Key;
+        s: Phaser.Input.Keyboard.Key;
+        d: Phaser.Input.Keyboard.Key;
+    };
+    private cursorPosition: Phaser.Math.Vector2;
+
+    constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'player');
 
-        this.playerId = playerId;
-        this.scene = scene;
-
-        // Add player to scene
+        // Add this sprite to the scene and physics world
         scene.add.existing(this);
-        scene.physics.add.existing(this);
+        scene.physics.world.enable(this);
 
-        // Movement properties
-        this.moveSpeed = 200;
-        this.isMoving = false;
-        this.targetX = x;
-        this.targetY = y;
-        this.lastInputTime = 0;
-        this.inputThrottleMs = 50; // Only send input every 50ms
+        // Setup input
+        if (!scene.input.keyboard) {
+            throw new Error("Keyboard input is not available on the scene.");
+        }
+        this.keys = {
+            w: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+            a: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+            s: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+            d: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+        };
 
-        // Input keys
-        this.keys = scene.input.keyboard.addKeys({
-            up: Phaser.Input.Keyboard.KeyCodes.W,
-            down: Phaser.Input.Keyboard.KeyCodes.S,
-            left: Phaser.Input.Keyboard.KeyCodes.A,
-            right: Phaser.Input.Keyboard.KeyCodes.D
+        // Initialize cursor position tracking
+        this.cursorPosition = new Phaser.Math.Vector2(0, 0);
+
+        // Track cursor position
+        scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+            this.cursorPosition.x = pointer.x;
+            this.cursorPosition.y = pointer.y;
         });
+
+        // Create animations
+        this.createAnimations();
+
+        // Start with idle animation
+        this.play('idle');
     }
 
-    update(time) {
-        // Handle input and send to server if it's been long enough since last input
-        const sendInput = time - this.lastInputTime > this.inputThrottleMs;
+    private createAnimations(): void {
+        const anims = this.scene.anims;
 
-        let directionX = 0;
-        let directionY = 0;
+        // Only create animations if they don't already exist
+        if (!anims.exists('idle')) {
+            // Idle animation
+            anims.create({
+                key: 'idle',
+                frames: anims.generateFrameNumbers('player', { start: 0, end: 7 }),
+                frameRate: 8,
+                repeat: -1
+            });
 
-        // Check movement keys
-        if (this.keys.up.isDown) {
-            directionY = -1;
-        } else if (this.keys.down.isDown) {
-            directionY = 1;
-        }
+            // Walking animations
+            anims.create({
+                key: 'walk-down',
+                frames: anims.generateFrameNumbers('player', { start: 9, end: 12 }),
+                frameRate: 8,
+                repeat: -1
+            });
 
-        if (this.keys.left.isDown) {
-            directionX = -1;
-        } else if (this.keys.right.isDown) {
-            directionX = 1;
-        }
+            anims.create({
+                key: 'walk-left',
+                frames: anims.generateFrameNumbers('player', { start: 9, end: 12 }),
+                frameRate: 8,
+                repeat: -1
+            });
 
-        // If player is moving, send input to server
-        if ((directionX !== 0 || directionY !== 0) && sendInput) {
-            // Get normalized direction to handle diagonal movement properly
-            if (directionX !== 0 && directionY !== 0) {
-                const magnitude = Math.sqrt(directionX * directionX + directionY * directionY);
-                directionX /= magnitude;
-                directionY /= magnitude;
-            }
+            anims.create({
+                key: 'walk-right',
+                frames: anims.generateFrameNumbers('player', { start: 9, end: 12 }),
+                frameRate: 8,
+                repeat: -1
+            });
 
-            // Send movement input to server
-            this.scene.socket.send(JSON.stringify({
-                action: 'move',
-                playerId: this.playerId,
-                directionX: directionX,
-                directionY: directionY,
-                timestamp: time
-            }));
-
-            this.lastInputTime = time;
-        }
-
-        // Smooth movement to server-provided position if not yet there
-        if (this.x !== this.targetX || this.y !== this.targetY) {
-            // Simple linear interpolation for position
-            this.x = Phaser.Math.Linear(this.x, this.targetX, 0.2);
-            this.y = Phaser.Math.Linear(this.y, this.targetY, 0.2);
-
-            // If close enough to target, snap to it
-            if (Phaser.Math.Distance.Between(this.x, this.y, this.targetX, this.targetY) < 0.5) {
-                this.x = this.targetX;
-                this.y = this.targetY;
-            }
+            anims.create({
+                key: 'walk-up',
+                frames: anims.generateFrameNumbers('player', { start: 9, end: 12 }),
+                frameRate: 8,
+                repeat: -1
+            });
         }
     }
 
-    // Update position based on server data
-    setServerPosition(x, y) {
-        this.targetX = x;
-        this.targetY = y;
+    update(): boolean {
+        // Reset velocity
+        this.body?.velocity.set(0, 0);
+
+        let isMoving = false;
+
+        // Handle movement based on WASD keys
+        if (this.keys.w.isDown) {
+            this.body.velocity.y = -this.movementSpeed;
+            this.play('walk-up', true);
+            isMoving = true;
+        } else if (this.keys.s.isDown) {
+            this.body.velocity.y = this.movementSpeed;
+            this.play('walk-down', true);
+            isMoving = true;
+        }
+
+        if (this.keys.a.isDown) {
+            this.body.velocity.x = -this.movementSpeed;
+            // Only change animation if not already moving vertically
+            if (!this.keys.w.isDown && !this.keys.s.isDown) {
+                this.play('walk-left', true);
+            }
+            isMoving = true;
+        } else if (this.keys.d.isDown) {
+            this.body.velocity.x = this.movementSpeed;
+            // Only change animation if not already moving vertically
+            if (!this.keys.w.isDown && !this.keys.s.isDown) {
+                this.play('walk-right', true);
+            }
+            isMoving = true;
+        }
+
+        // Normalize diagonal movement
+        if (isMoving && Math.abs(this.body.velocity.x) > 0 && Math.abs(this.body.velocity.y) > 0) {
+            this.body.velocity.normalize().scale(this.movementSpeed);
+        } else if (!isMoving) {
+            // Play idle animation if not moving
+            this.play('idle', true);
+        }
+
+        // Update sprite direction based on cursor position
+        this.updateSpriteDirection();
+
+        return isMoving;
+    }
+
+    // Update sprite direction based on cursor position
+    private updateSpriteDirection() {
+        // Get the camera-adjusted player position
+        const camera = this.scene.cameras.main;
+        const playerScreenX = this.x - camera.scrollX;
+
+        // Compare with cursor position
+        if (this.cursorPosition.x > playerScreenX) {
+            // Cursor is to the right of the player, face right
+            this.setFlipX(false);
+        } else {
+            // Cursor is to the left of the player, face left
+            this.setFlipX(true);
+        }
+    }
+
+    // Method to get current movement speed
+    getMovementSpeed(): number {
+        return this.movementSpeed;
+    }
+
+    // Method to set movement speed
+    setMovementSpeed(speed: number): void {
+        this.movementSpeed = speed;
     }
 }
