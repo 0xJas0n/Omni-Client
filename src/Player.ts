@@ -9,6 +9,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         d: Phaser.Input.Keyboard.Key;
     };
     private cursorPosition: Phaser.Math.Vector2;
+    declare body: Phaser.Physics.Arcade.Body;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'player');
@@ -16,6 +17,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Add this sprite to the scene and physics world
         scene.add.existing(this);
         scene.physics.world.enable(this);
+        this.body = this.body as Phaser.Physics.Arcade.Body;
 
         // Setup input
         if (!scene.input.keyboard) {
@@ -47,7 +49,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private createAnimations(): void {
         const anims = this.scene.anims;
 
-        // Only create animations if they don't already exist
         if (!anims.exists('idle')) {
             // Idle animation
             anims.create({
@@ -125,11 +126,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (isMoving && Math.abs(this.body.velocity.x) > 0 && Math.abs(this.body.velocity.y) > 0) {
             this.body.velocity.normalize().scale(this.movementSpeed);
         } else if (!isMoving) {
-            // Play idle animation if not moving
             this.play('idle', true);
         }
 
-        // Update sprite direction based on cursor position
         this.updateSpriteDirection();
 
         return isMoving;
@@ -141,22 +140,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         const camera = this.scene.cameras.main;
         const playerScreenX = this.x - camera.scrollX;
 
-        // Compare with cursor position
         if (this.cursorPosition.x > playerScreenX) {
-            // Cursor is to the right of the player, face right
             this.setFlipX(false);
         } else {
-            // Cursor is to the left of the player, face left
             this.setFlipX(true);
         }
     }
 
-    // Method to get current movement speed
     getMovementSpeed(): number {
         return this.movementSpeed;
     }
 
-    // Method to set movement speed
     setMovementSpeed(speed: number): void {
         this.movementSpeed = speed;
     }
