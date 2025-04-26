@@ -1,11 +1,13 @@
 import './App.css'
 import Game from "./components/game/Game.tsx";
+import EscapeMenu from "./components/game/EscapeMenu.tsx";
 
 function App() {
 
   return (
     <>
-      <Game></Game>
+        <EscapeMenu />
+        <Game></Game>
     </>
   )
 }
