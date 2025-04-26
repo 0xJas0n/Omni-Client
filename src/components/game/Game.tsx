@@ -20,7 +20,7 @@ const GameConst = () => {
             physics: {
                 default: 'arcade',
                 arcade: {
-                    debug: true
+                    debug: false
                 }
             },
             scale: {
@@ -36,7 +36,7 @@ const GameConst = () => {
         };
     }, []);
 
-    return <div id="phaser-container" />;
+    return <div id="phaser-container"/>;
 };
 
 export default GameConst;

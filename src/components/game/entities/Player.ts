@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
+    declare body: Phaser.Physics.Arcade.Body;
     private movementSpeed: number = 100;
     private keys: {
         w: Phaser.Input.Keyboard.Key;
@@ -9,7 +10,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         d: Phaser.Input.Keyboard.Key;
     };
     private cursorPosition: Phaser.Math.Vector2;
-    declare body: Phaser.Physics.Arcade.Body;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'player');
@@ -17,7 +17,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Add this sprite to the scene and physics world
         scene.add.existing(this);
         scene.physics.world.enable(this);
+        this.setDepth(1);
         this.body = this.body as Phaser.Physics.Arcade.Body;
+        this.body.setSize(10, 14);
+        this.body.setOffset(6, 8);
+        this.body.collideWorldBounds = true;
 
         // Setup input
         if (!scene.input.keyboard) {
@@ -44,49 +48,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Start with idle animation
         this.play('idle');
-    }
-
-    private createAnimations(): void {
-        const anims = this.scene.anims;
-
-        if (!anims.exists('idle')) {
-            // Idle animation
-            anims.create({
-                key: 'idle',
-                frames: anims.generateFrameNumbers('player', { start: 0, end: 7 }),
-                frameRate: 8,
-                repeat: -1
-            });
-
-            // Walking animations
-            anims.create({
-                key: 'walk-down',
-                frames: anims.generateFrameNumbers('player', { start: 9, end: 12 }),
-                frameRate: 8,
-                repeat: -1
-            });
-
-            anims.create({
-                key: 'walk-left',
-                frames: anims.generateFrameNumbers('player', { start: 9, end: 12 }),
-                frameRate: 8,
-                repeat: -1
-            });
-
-            anims.create({
-                key: 'walk-right',
-                frames: anims.generateFrameNumbers('player', { start: 9, end: 12 }),
-                frameRate: 8,
-                repeat: -1
-            });
-
-            anims.create({
-                key: 'walk-up',
-                frames: anims.generateFrameNumbers('player', { start: 9, end: 12 }),
-                frameRate: 8,
-                repeat: -1
-            });
-        }
     }
 
     update(): boolean {
@@ -134,6 +95,72 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         return isMoving;
     }
 
+    getMovementSpeed(): number {
+        return this.movementSpeed;
+    }
+
+    setMovementSpeed(speed: number): void {
+        this.movementSpeed = speed;
+    }
+
+    private createAnimations(): void {
+        const anims = this.scene.anims;
+
+        if (!anims.exists('idle')) {
+            // Idle animation
+            anims.create({
+                key: 'idle',
+                frames: anims.generateFrameNumbers('player', {
+                    start: 0,
+                    end: 7
+                }),
+                frameRate: 8,
+                repeat: -1
+            });
+
+            // Walking animations
+            anims.create({
+                key: 'walk-down',
+                frames: anims.generateFrameNumbers('player', {
+                    start: 9,
+                    end: 12
+                }),
+                frameRate: 8,
+                repeat: -1
+            });
+
+            anims.create({
+                key: 'walk-left',
+                frames: anims.generateFrameNumbers('player', {
+                    start: 9,
+                    end: 12
+                }),
+                frameRate: 8,
+                repeat: -1
+            });
+
+            anims.create({
+                key: 'walk-right',
+                frames: anims.generateFrameNumbers('player', {
+                    start: 9,
+                    end: 12
+                }),
+                frameRate: 8,
+                repeat: -1
+            });
+
+            anims.create({
+                key: 'walk-up',
+                frames: anims.generateFrameNumbers('player', {
+                    start: 9,
+                    end: 12
+                }),
+                frameRate: 8,
+                repeat: -1
+            });
+        }
+    }
+
     // Update sprite direction based on cursor position
     private updateSpriteDirection() {
         // Get the camera-adjusted player position
@@ -145,13 +172,5 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         } else {
             this.setFlipX(true);
         }
-    }
-
-    getMovementSpeed(): number {
-        return this.movementSpeed;
-    }
-
-    setMovementSpeed(speed: number): void {
-        this.movementSpeed = speed;
     }
 }
