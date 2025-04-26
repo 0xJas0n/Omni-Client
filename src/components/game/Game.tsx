@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import React from "react";
-import MenuScene from "../../scenes/MenuScene.ts";
+import MenuScene from "./scenes/MenuScene";
 import GameConfig = Phaser.Types.Core.GameConfig;
 
 const GameConst = () => {
