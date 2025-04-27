@@ -32,17 +32,22 @@ export default class MenuScene extends Phaser.Scene {
         const mapHeight = map.heightInPixels;
         let backgroundLayer: TilemapLayer | null = null;
         let collisionLayer: TilemapLayer | null = null;
+        let treeTrunkLayer: TilemapLayer | null = null;
+        let treeToplayer: TilemapLayer | null = null;
+
         if (tileset) {
             backgroundLayer = map.createLayer('Ground', tileset);
             collisionLayer = map.createLayer('Collision', tileset);
+            treeTrunkLayer = map.createLayer('TreeTrunk', tileset);
+            treeToplayer = map.createLayer('TreeTop', tileset);
             map.createLayer('Foliage', tileset);
         }
 
-        if (collisionLayer && backgroundLayer) {
-            collisionLayer.setCollisionByProperty({collides: true});
-            backgroundLayer.setDepth(0);
-            collisionLayer.setDepth(2);
-        }
+        collisionLayer?.setCollisionByProperty({collides: true});
+        backgroundLayer?.setDepth(0);
+        treeTrunkLayer?.setDepth(0)
+        collisionLayer?.setDepth(2);
+        treeToplayer?.setDepth(2);
 
         // Display collision boxes for debugging
         // const debugGraphics = this.add.graphics().setAlpha(0.75);
