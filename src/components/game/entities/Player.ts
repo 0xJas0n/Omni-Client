@@ -59,11 +59,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Handle movement based on WASD keys
         if (this.keys.w.isDown) {
             this.body.velocity.y = -this.movementSpeed;
-            this.play('walk-up', true);
+            this.play('walk', true);
             isMoving = true;
         } else if (this.keys.s.isDown) {
             this.body.velocity.y = this.movementSpeed;
-            this.play('walk-down', true);
+            this.play('walk', true);
             isMoving = true;
         }
 
@@ -71,14 +71,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.body.velocity.x = -this.movementSpeed;
             // Only change animation if not already moving vertically
             if (!this.keys.w.isDown && !this.keys.s.isDown) {
-                this.play('walk-left', true);
+                this.play('walk', true);
             }
             isMoving = true;
         } else if (this.keys.d.isDown) {
             this.body.velocity.x = this.movementSpeed;
             // Only change animation if not already moving vertically
             if (!this.keys.w.isDown && !this.keys.s.isDown) {
-                this.play('walk-right', true);
+                this.play('walk', true);
             }
             isMoving = true;
         }
@@ -105,7 +105,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     private createAnimations(): void {
         const anims = this.scene.anims;
-
         if (!anims.exists('idle')) {
             // Idle animation
             anims.create({
@@ -120,37 +119,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
             // Walking animations
             anims.create({
-                key: 'walk-down',
-                frames: anims.generateFrameNumbers('player', {
-                    start: 9,
-                    end: 12
-                }),
-                frameRate: 8,
-                repeat: -1
-            });
-
-            anims.create({
-                key: 'walk-left',
-                frames: anims.generateFrameNumbers('player', {
-                    start: 9,
-                    end: 12
-                }),
-                frameRate: 8,
-                repeat: -1
-            });
-
-            anims.create({
-                key: 'walk-right',
-                frames: anims.generateFrameNumbers('player', {
-                    start: 9,
-                    end: 12
-                }),
-                frameRate: 8,
-                repeat: -1
-            });
-
-            anims.create({
-                key: 'walk-up',
+                key: 'walk',
                 frames: anims.generateFrameNumbers('player', {
                     start: 9,
                     end: 12
