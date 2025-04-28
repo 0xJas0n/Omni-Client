@@ -8,7 +8,7 @@ export default class MenuScene extends Phaser.Scene {
     private backgroundMusic?: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
 
     constructor() {
-        super({ key: 'MenuScene' }); // Explicitly set the scene key
+        super({ key: 'MenuScene' });
     }
 
     preload(): void {
@@ -23,9 +23,29 @@ export default class MenuScene extends Phaser.Scene {
             frameWidth: 24,
             frameHeight: 24,
         });
+        this.load.spritesheet('tree_0', 'assets/sprites/environment/tree_0.png', {
+            frameWidth: 16,
+            frameHeight: 27,
+        });
         this.load.spritesheet('tree_1', 'assets/sprites/environment/tree_1.png', {
             frameWidth: 22,
             frameHeight: 42,
+        });
+        this.load.spritesheet('tree_2', 'assets/sprites/environment/tree_2.png', {
+            frameWidth: 22,
+            frameHeight: 54,
+        });
+        this.load.spritesheet('tree_3', 'assets/sprites/environment/tree_3.png', {
+            frameWidth: 30,
+            frameHeight: 43,
+        });
+        this.load.spritesheet('tree_4', 'assets/sprites/environment/tree_4.png', {
+            frameWidth: 42,
+            frameHeight: 43,
+        });
+        this.load.spritesheet('tree_5', 'assets/sprites/environment/tree_5.png', {
+            frameWidth: 42,
+            frameHeight: 43,
         });
     }
 
@@ -36,15 +56,11 @@ export default class MenuScene extends Phaser.Scene {
         // Create map layers
         const groundLayer = map.createLayer('Ground', tileset);
         const collisionLayer = map.createLayer('Collision', tileset);
-        const treeTrunkLayer = map.createLayer('TreeTrunk', tileset);
-        const treeTopLayer = map.createLayer('TreeTop', tileset);
         map.createLayer('Foliage', tileset);
 
         // Set layer depths for rendering order
         groundLayer?.setDepth(0);
-        treeTrunkLayer?.setDepth(1); // Ensure tree trunks are above ground
         collisionLayer?.setDepth(2);
-        treeTopLayer?.setDepth(3); // Ensure tree tops are above other elements
 
         this.createStaticObjects(map, 'Trees', (gameObject: Phaser.GameObjects.GameObject) => {
             const sprite = gameObject as Phaser.GameObjects.Sprite;
@@ -86,6 +102,7 @@ export default class MenuScene extends Phaser.Scene {
         creationCallback: (gameObject: Phaser.GameObjects.GameObject) => void
     ): void {
         const objectLayer = map.getObjectLayer(objectLayerName);
+
         if (!objectLayer) {
             console.warn(`Object layer "${objectLayerName}" not found.`);
             return;
