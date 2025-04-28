@@ -54,6 +54,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     update(): boolean {
         // Reset velocity
         this.body?.velocity.set(0, 0);
+        this.setDepth(this.y);
 
         let isMoving = false;
 

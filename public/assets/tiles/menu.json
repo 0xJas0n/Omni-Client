@@ -415,17 +415,34 @@
         }, 
         {
          "draworder":"topdown",
-         "id":6,
-         "name":"Trigger",
-         "objects":[],
+         "id":12,
+         "name":"Trees",
+         "objects":[
+                {
+                 "height":16,
+                 "id":3,
+                 "name":"tree_1",
+                 "properties":[
+                        {
+                         "name":"treeType",
+                         "type":"string",
+                         "value":"tree_1"
+                        }],
+                 "rotation":0,
+                 "type":"tree",
+                 "visible":true,
+                 "width":16,
+                 "x":208,
+                 "y":208
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
          "x":0,
          "y":0
         }],
- "nextlayerid":12,
- "nextobjectid":1,
+ "nextlayerid":13,
+ "nextobjectid":4,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
