@@ -2,6 +2,7 @@ import TilemapLayer = Phaser.Tilemaps.TilemapLayer;
 import Player from "../entities/Player.ts";
 import Shopkeeper from "../entities/Shopkeeper.ts";
 import bg_music from "/assets/audio/music/menu.mp3";
+import setTilePos from "../../../utils/setTilePos.ts";
 
 export default class MenuScene extends Phaser.Scene {
     private player: Player | undefined;
@@ -43,43 +44,34 @@ export default class MenuScene extends Phaser.Scene {
             map.createLayer('Foliage', tileset);
         }
 
-        collisionLayer?.setCollisionByProperty({collides: true});
         backgroundLayer?.setDepth(0);
         treeTrunkLayer?.setDepth(0)
         collisionLayer?.setDepth(2);
         treeToplayer?.setDepth(2);
 
+        treeTrunkLayer?.setCollisionByProperty({collides: true});
+
         // Display collision boxes for debugging
         // const debugGraphics = this.add.graphics().setAlpha(0.75);
-        //         collisionLayer.renderDebug(debugGraphics, {
+        //     treeToplayer?.renderDebug(debugGraphics, {
         //             tileColor: null,
         //             collidingTileColor: new Phaser.Display.Color(243, 234, 48, 255),
         //             faceColor: new Phaser.Display.Color(40, 39, 37, 255)
         //         })
 
-        // Set the physics world bounds
+        // Set the physics and camera world bounds
         this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
-
-        // Set the camera bounds to match the tilemap dimensions
         this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
-        // Helper functions for positioning
-        const tileSize = 16;
-        const xPos = (tileX: number) => tileX * tileSize + tileSize / 2;
-        const yPos = (tileY: number) => tileY * tileSize + tileSize / 2;
+        new Shopkeeper(this, setTilePos(10), setTilePos(9));
+        this.player = new Player(this, setTilePos(18), setTilePos(12));
 
-        new Shopkeeper(this, xPos(10), yPos(9));
-
-        // Create and set up player
-        this.player = new Player(this, xPos(18), yPos(12));
-        this.physics.world.enable(this.player);
-        if (collisionLayer) {
-            this.physics.add.collider(this.player, collisionLayer);
+        if (treeTrunkLayer) {
+            this.physics.add.collider(this.player, treeTrunkLayer);
         }
 
         if (this.player) {
             this.cameras.main.startFollow(this.player, true);
-            // The parameters control the smoothness of camera movement (values between 0 and 1)
             this.cameras.main.setLerp(0.1, 0.1);
         }
 

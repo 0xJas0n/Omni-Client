@@ -17,10 +17,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Add this sprite to the scene and physics world
         scene.add.existing(this);
         scene.physics.world.enable(this);
-        this.setDepth(1);
+
+        this.setDepth(this.y);
         this.body = this.body as Phaser.Physics.Arcade.Body;
-        this.body.setSize(10, 14);
-        this.body.setOffset(6, 8);
+        this.body.setSize(10, 3);
+        this.body.setOffset(6, 20);
         this.body.collideWorldBounds = true;
 
         // Setup input
