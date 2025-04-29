@@ -53,6 +53,11 @@ export default class MenuScene extends Phaser.Scene {
         const map = this.make.tilemap({ key: 'menu' });
         const tileset = map.addTilesetImage('map', 'tiles');
 
+        if (!tileset) {
+            console.warn('Tileset not found.');
+            return;
+        }
+
         // Create map layers
         const groundLayer = map.createLayer('Ground', tileset);
         const collisionLayer = map.createLayer('Collision', tileset);
