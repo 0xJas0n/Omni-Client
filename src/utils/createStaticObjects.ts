@@ -52,7 +52,7 @@ export default function createStaticObjects(
                 case 'lantern': {
                     const isOn = objData.properties?.find((p: {
                         name: string;
-                    }) => p.name === 'isOn')?.value || true;
+                    }) => p.name === 'isOn')?.value;
                     const ground = objData.properties?.find((p: {
                         name: string;
                     }) => p.name === 'ground')?.value || 'light';
