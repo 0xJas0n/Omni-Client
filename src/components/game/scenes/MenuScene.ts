@@ -6,6 +6,7 @@ import setTilePos from "../../../utils/setTilePos.ts";
 export default class MenuScene extends Phaser.Scene {
     private player?: Player;
     private backgroundMusic?: Phaser.Sound.NoAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.WebAudioSound;
+    private collisionGroup: Phaser.Physics.Arcade.StaticGroup | undefined;
 
     constructor() {
         super({ key: 'MenuScene' });
@@ -60,12 +61,10 @@ export default class MenuScene extends Phaser.Scene {
 
         // Create map layers
         const groundLayer = map.createLayer('Ground', tileset);
-        const collisionLayer = map.createLayer('Collision', tileset);
         map.createLayer('Foliage', tileset);
 
         // Set layer depths for rendering order
         groundLayer?.setDepth(0);
-        collisionLayer?.setDepth(2);
 
         this.createStaticObjects(map, 'Trees', (gameObject: Phaser.GameObjects.GameObject) => {
             const sprite = gameObject as Phaser.GameObjects.Sprite;
@@ -73,19 +72,18 @@ export default class MenuScene extends Phaser.Scene {
             sprite.setDepth(sprite.y - 10);
         });
 
-        // Enable collision on the collision layer
-        collisionLayer?.setCollisionByProperty({ collides: true });
+        // Create static collision objects from the 'Collision' object layer
+        this.collisionGroup = this.physics.add.staticGroup();
+        this.createCollisionObjects(map, 'Collision', this.collisionGroup);
+
+        // Enable collision on the world bounds
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
         // Create entities
         new Shopkeeper(this, setTilePos(10), setTilePos(9));
         this.player = new Player(this, setTilePos(18), setTilePos(12));
-
-        // Add collider between player and collision layer
-        if (this.player && collisionLayer) {
-            this.physics.add.collider(this.player, collisionLayer);
-        }
+        this.physics.add.collider(this.player, this.collisionGroup);
 
         // Camera setup
         if (this.player) {
@@ -132,6 +130,31 @@ export default class MenuScene extends Phaser.Scene {
 
                 creationCallback(gameObject);
             }
+        });
+    }
+
+    // Create static collision object group
+    private createCollisionObjects(
+        map: Phaser.Tilemaps.Tilemap,
+        objectLayerName: string,
+        group: Phaser.Physics.Arcade.StaticGroup
+    ): void {
+        const collisionLayer = map.getObjectLayer(objectLayerName);
+
+        if (!collisionLayer) {
+            console.warn(`Object layer "${objectLayerName}" not found.`);
+            return;
+        }
+
+        collisionLayer.objects.forEach(object => {
+            const x = object.x ?? 0;
+            const y = object.y ?? 0;
+            const width = object.width ?? 0;
+            const height = object.height ?? 0;
+
+            const rectangle = this.add.rectangle(x + width/2, y + height/2, width, height);
+            this.physics.add.existing(rectangle, true);
+            group.add(rectangle);
         });
     }
 }
