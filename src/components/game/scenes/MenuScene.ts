@@ -2,6 +2,7 @@ import Player from '../entities/Player';
 import Shopkeeper from '../entities/Shopkeeper';
 import bgMusicAsset from '/assets/audio/music/menu.mp3';
 import setTilePos from "../../../utils/setTilePos.ts";
+import createStaticObjects from "../../../utils/createStaticObjects.ts";
 
 export default class MenuScene extends Phaser.Scene {
     private player?: Player;
@@ -48,6 +49,14 @@ export default class MenuScene extends Phaser.Scene {
             frameWidth: 42,
             frameHeight: 43,
         });
+        this.load.spritesheet('sign_big_light_wood_front', 'assets/sprites/environment/sign_big_light_wood_front.png', {
+            frameWidth: 54,
+            frameHeight: 46,
+        });
+        this.load.spritesheet('lantern_light_true', 'assets/sprites/environment/lantern_light_true.png', {
+            frameWidth: 12,
+            frameHeight: 45,
+        });
     }
 
     create(): void {
@@ -66,11 +75,8 @@ export default class MenuScene extends Phaser.Scene {
         // Set layer depths for rendering order
         groundLayer?.setDepth(0);
 
-        this.createStaticObjects(map, 'Trees', (gameObject: Phaser.GameObjects.GameObject) => {
-            const sprite = gameObject as Phaser.GameObjects.Sprite;
-            sprite.setOrigin(0.5, 1);
-            sprite.setDepth(sprite.y - 10);
-        });
+        createStaticObjects(this, map, 'Trees');
+        createStaticObjects(this, map, 'Environment');
 
         // Create static collision objects from the 'Collision' object layer
         this.collisionGroup = this.physics.add.staticGroup();
@@ -97,40 +103,6 @@ export default class MenuScene extends Phaser.Scene {
 
     update(): void {
         this.player?.update();
-    }
-
-    private createStaticObjects(
-        map: Phaser.Tilemaps.Tilemap,
-        objectLayerName: string,
-        creationCallback: (gameObject: Phaser.GameObjects.GameObject) => void
-    ): void {
-        const objectLayer = map.getObjectLayer(objectLayerName);
-
-        if (!objectLayer) {
-            console.warn(`Object layer "${objectLayerName}" not found.`);
-            return;
-        }
-
-        objectLayer.objects.forEach((objData) => {
-            if (objData.type) {
-                let gameObject: Phaser.GameObjects.GameObject;
-                const x = objData.x ?? 0;
-                const y = objData.y ?? 0;
-
-                switch (objData.type) {
-                    case 'tree': {
-                        const treeType = objData.properties?.find((p: { name: string }) => p.name === 'treeType')?.value || 'tree_1';
-                        gameObject = this.add.sprite(x + (objData.width ?? 0) / 2, y + (objData.height ?? 0), treeType);
-                        break;
-                    }
-                    default:
-                        console.warn(`Unsupported object type: "${objData.type}"`);
-                        return;
-                }
-
-                creationCallback(gameObject);
-            }
-        });
     }
 
     // Create static collision object group
