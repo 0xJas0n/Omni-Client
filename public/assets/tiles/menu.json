@@ -259,7 +259,7 @@
                 {
                  "height":16,
                  "id":78,
-                 "name":"",
+                 "name":"sign",
                  "properties":[
                         {
                          "name":"ground",
@@ -291,7 +291,7 @@
                 {
                  "height":16,
                  "id":79,
-                 "name":"",
+                 "name":"lantern",
                  "properties":[
                         {
                          "name":"ground",
@@ -313,7 +313,7 @@
                 {
                  "height":16,
                  "id":82,
-                 "name":"",
+                 "name":"lantern",
                  "properties":[
                         {
                          "name":"ground",
@@ -331,6 +331,28 @@
                  "width":16,
                  "x":32,
                  "y":144
+                }, 
+                {
+                 "height":16,
+                 "id":83,
+                 "name":"lantern",
+                 "properties":[
+                        {
+                         "name":"ground",
+                         "type":"string",
+                         "value":"light"
+                        }, 
+                        {
+                         "name":"isOn",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"lantern",
+                 "visible":true,
+                 "width":16,
+                 "x":432,
+                 "y":176
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -644,7 +666,7 @@
          "y":0
         }],
  "nextlayerid":16,
- "nextobjectid":83,
+ "nextobjectid":84,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
